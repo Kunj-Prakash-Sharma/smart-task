@@ -48,7 +48,7 @@ export function UpcomingTaskList({ initialTasks }: UpcomingTaskListProps) {
         <div key={group.dateKey} className="flex flex-col gap-2">
           <h2 className="text-sm font-medium text-muted-foreground">{group.label}</h2>
           <Card>
-            <CardContent className="p-4">
+            <CardContent className="flex flex-col gap-0.5 p-3">
               {group.tasks.map((task) => (
                 <TaskRow key={task.id} task={task} onToggle={toggle} />
               ))}

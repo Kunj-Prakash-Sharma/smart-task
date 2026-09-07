@@ -12,7 +12,7 @@ export function InboxTaskList({ initialTasks }: InboxTaskListProps) {
   const { tasks, toggle } = useOptimisticTasks(initialTasks);
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col gap-0.5">
       {tasks.map((task) => (
         <TaskRow key={task.id} task={task} onToggle={toggle} />
       ))}

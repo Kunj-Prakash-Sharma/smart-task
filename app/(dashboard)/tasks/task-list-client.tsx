@@ -82,7 +82,7 @@ export function TaskListClient({ initialTasks }: TaskListClientProps) {
 
       {filtered.length > 0 ? (
         <Card>
-          <CardContent className="p-4">
+          <CardContent className="flex flex-col gap-0.5 p-3">
             {filtered.map((task) => (
               <TaskRow key={task.id} task={task} onToggle={toggle} />
             ))}

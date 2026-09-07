@@ -23,7 +23,10 @@ export function TaskRow({ task, onToggle, onClick }: TaskRowProps) {
   return (
     <div
       onClick={onClick}
-      className="flex cursor-pointer items-center gap-3 border-b py-2 last:border-b-0"
+      className={cn(
+        'flex cursor-pointer items-center gap-3 rounded-lg px-2 py-2.5 transition-colors hover:bg-muted/60',
+        isCompleted && 'opacity-60',
+      )}
     >
       <div onClick={(event) => event.stopPropagation()}>
         <Checkbox checked={isCompleted} onCheckedChange={() => onToggle?.(task.id)} />
@@ -58,7 +61,7 @@ export function TaskRow({ task, onToggle, onClick }: TaskRowProps) {
         <span
           className={cn(
             'inline-flex shrink-0 items-center gap-1 text-xs text-muted-foreground',
-            overdue && 'text-destructive',
+            overdue && 'font-medium text-destructive',
           )}
         >
           <CalendarClock size={14} />

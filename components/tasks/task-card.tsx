@@ -22,21 +22,27 @@ export function TaskCard({ task, onToggle, onClick }: TaskCardProps) {
   const tags = task.task_tags.map((taskTag) => taskTag.tags);
 
   return (
-    <Card onClick={onClick} className="cursor-pointer p-3 transition-colors hover:bg-accent/50">
+    <Card
+      onClick={onClick}
+      className={cn(
+        'cursor-pointer p-3 transition-all hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-md',
+        isCompleted && 'opacity-60',
+      )}
+    >
       <div className="flex items-start gap-2">
         <div className="pt-0.5" onClick={(event) => event.stopPropagation()}>
           <Checkbox checked={isCompleted} onCheckedChange={() => onToggle?.(task.id)} />
         </div>
         <p
           className={cn(
-            'flex-1 text-sm font-medium',
+            'flex-1 text-sm font-medium leading-snug',
             isCompleted && 'text-muted-foreground line-through',
           )}
         >
           {task.title}
         </p>
       </div>
-      <div className="mt-2 flex flex-wrap items-center gap-1.5 pl-6">
+      <div className="mt-2.5 flex flex-wrap items-center gap-1.5 pl-6">
         <TaskPriorityBadge priority={task.priority} />
         {task.is_recurring ? (
           <span title="Repeats every working day" className="text-muted-foreground">
@@ -59,7 +65,7 @@ export function TaskCard({ task, onToggle, onClick }: TaskCardProps) {
           <span
             className={cn(
               'inline-flex items-center gap-1 text-xs text-muted-foreground',
-              overdue && 'text-destructive',
+              overdue && 'font-medium text-destructive',
             )}
           >
             <CalendarClock size={14} />
