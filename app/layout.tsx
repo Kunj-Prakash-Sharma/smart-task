@@ -1,6 +1,10 @@
 import type { Metadata } from 'next';
+import { Geist, Geist_Mono } from 'next/font/google';
 import { Toaster } from 'sonner';
 import './globals.css';
+
+const geistSans = Geist({ subsets: ['latin'], variable: '--font-sans' });
+const geistMono = Geist_Mono({ subsets: ['latin'], variable: '--font-mono' });
 
 export const metadata: Metadata = {
   title: 'TaskFlow',
@@ -9,8 +13,8 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
-      <body className="antialiased">
+    <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
+      <body className="font-sans antialiased">
         {children}
         <Toaster richColors position="top-right" />
       </body>
