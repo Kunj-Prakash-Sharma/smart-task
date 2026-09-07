@@ -1,6 +1,7 @@
-import { CalendarCheck, ListTodo } from 'lucide-react';
+import { CalendarCheck, LayoutDashboard, ListTodo } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { EmptyState } from '@/components/shared/empty-state';
+import { PageHeader } from '@/components/shared/page-header';
 import { ListCard } from '@/components/lists/list-card';
 import { ListCreateDialog } from '@/components/lists/list-create-dialog';
 import { TaskCreateDialog } from '@/components/tasks/task-create-dialog';
@@ -14,10 +15,11 @@ export default async function OverviewPage() {
 
   return (
     <div className="flex flex-col gap-8">
-      <div className="flex items-center justify-between gap-4">
-        <h1 className="text-2xl font-semibold tracking-tight">Overview</h1>
-        {firstOwnedList ? <TaskCreateDialog listId={firstOwnedList.id} /> : null}
-      </div>
+      <PageHeader
+        icon={LayoutDashboard}
+        title="Overview"
+        action={firstOwnedList ? <TaskCreateDialog listId={firstOwnedList.id} /> : null}
+      />
 
       <section className="flex flex-col gap-3">
         <h2 className="text-lg font-medium">Due today</h2>

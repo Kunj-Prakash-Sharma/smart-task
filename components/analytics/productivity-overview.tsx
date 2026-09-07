@@ -18,10 +18,10 @@ export interface ProductivityOverviewProps {
   data: AnalyticsDailyProductivityRow[];
 }
 
-const CREATED_COLOR = '#eb6834';
-const COMPLETED_COLOR = '#2a78d6';
-const AXIS_COLOR = '#898781';
-const GRID_COLOR = 'rgba(136,134,129,0.2)';
+const CREATED_COLOR = 'hsl(var(--warning))';
+const COMPLETED_COLOR = 'hsl(var(--primary))';
+const AXIS_COLOR = 'hsl(var(--muted-foreground))';
+const GRID_COLOR = 'hsl(var(--border))';
 
 function formatTick(value: string): string {
   return format(parseISO(value), 'MMM d');

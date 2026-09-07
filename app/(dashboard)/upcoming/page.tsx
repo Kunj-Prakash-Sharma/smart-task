@@ -1,5 +1,6 @@
 import { CalendarRange } from 'lucide-react';
 import { EmptyState } from '@/components/shared/empty-state';
+import { PageHeader } from '@/components/shared/page-header';
 import { getUpcomingTasks } from '@/lib/data/tasks';
 import { UpcomingTaskList } from './upcoming-task-list';
 
@@ -8,10 +9,7 @@ export default async function UpcomingPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Upcoming</h1>
-        <p className="text-sm text-muted-foreground">Next 7 days</p>
-      </div>
+      <PageHeader icon={CalendarRange} title="Upcoming" description="Next 7 days" />
       {tasks.length > 0 ? (
         <UpcomingTaskList initialTasks={tasks} />
       ) : (

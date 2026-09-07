@@ -2,6 +2,7 @@ import { Folders } from 'lucide-react';
 import { ListCard } from '@/components/lists/list-card';
 import { ListCreateDialog } from '@/components/lists/list-create-dialog';
 import { EmptyState } from '@/components/shared/empty-state';
+import { PageHeader } from '@/components/shared/page-header';
 import { getLists } from '@/lib/data/lists';
 
 export default async function ListsPage() {
@@ -9,10 +10,7 @@ export default async function ListsPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold tracking-tight text-foreground">Lists</h1>
-        <ListCreateDialog />
-      </div>
+      <PageHeader icon={Folders} title="Lists" action={<ListCreateDialog />} />
 
       {lists.length === 0 ? (
         <EmptyState

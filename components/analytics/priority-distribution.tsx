@@ -11,10 +11,10 @@ export interface PriorityDistributionProps {
 }
 
 const PRIORITY_COLORS: Record<TaskPriority, string> = {
-  urgent: '#dc2626',
-  high: '#ea580c',
-  medium: '#2563eb',
-  low: '#64748b',
+  urgent: 'hsl(var(--destructive))',
+  high: 'hsl(var(--warning))',
+  medium: 'hsl(var(--primary))',
+  low: 'hsl(var(--muted-foreground))',
 };
 
 export function PriorityDistribution({ data }: PriorityDistributionProps) {

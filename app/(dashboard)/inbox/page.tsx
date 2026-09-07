@@ -1,6 +1,7 @@
 import { Inbox } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { EmptyState } from '@/components/shared/empty-state';
+import { PageHeader } from '@/components/shared/page-header';
 import { getInboxTasks } from '@/lib/data/tasks';
 import { InboxTaskList } from './inbox-task-list';
 
@@ -9,10 +10,7 @@ export default async function InboxPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Inbox</h1>
-        <p className="text-sm text-muted-foreground">Tasks assigned to you by others</p>
-      </div>
+      <PageHeader icon={Inbox} title="Inbox" description="Tasks assigned to you by others" />
       {tasks.length > 0 ? (
         <Card>
           <CardContent className="p-4">

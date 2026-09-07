@@ -19,10 +19,10 @@ export interface CompletionChartProps {
   data: AnalyticsCompletionVelocity7dRow[];
 }
 
-const DAILY_COLOR = '#2a78d6';
-const ROLLING_COLOR = '#eb6834';
-const AXIS_COLOR = '#898781';
-const GRID_COLOR = 'rgba(136,134,129,0.2)';
+const DAILY_COLOR = 'hsl(var(--primary))';
+const ROLLING_COLOR = 'hsl(var(--success))';
+const AXIS_COLOR = 'hsl(var(--muted-foreground))';
+const GRID_COLOR = 'hsl(var(--border))';
 
 function formatTick(value: string): string {
   return format(parseISO(value), 'MMM d');

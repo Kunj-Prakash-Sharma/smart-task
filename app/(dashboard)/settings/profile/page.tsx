@@ -1,4 +1,6 @@
+import { UserRound } from 'lucide-react';
 import { ProfileForm } from '@/app/(dashboard)/settings/profile/profile-form';
+import { PageHeader } from '@/components/shared/page-header';
 import { createClient } from '@/lib/supabase/server';
 import { getProfile } from '@/lib/data/users';
 
@@ -13,7 +15,7 @@ export default async function ProfilePage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="text-2xl font-semibold tracking-tight text-foreground">Profile</h1>
+      <PageHeader icon={UserRound} title="Profile" />
 
       <ProfileForm
         email={user!.email ?? ''}
