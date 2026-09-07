@@ -1,9 +1,12 @@
+import { cookies } from 'next/headers';
 import { createClient } from '@/lib/supabase/server';
 import { getLists } from '@/lib/data/lists';
 import { getProfile } from '@/lib/data/users';
 import { getTasksDueToday } from '@/lib/data/tasks';
 import { Sidebar } from '@/components/app-shell/sidebar';
 import { Topbar } from '@/components/app-shell/topbar';
+import { CommandPaletteProvider } from '@/components/app-shell/command-palette';
+import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 import { KeyboardShortcuts } from '@/components/shared/keyboard-shortcuts';
 import { LiveTaskProvider } from '@/hooks/use-live-task';
 
@@ -24,26 +27,28 @@ export default async function DashboardLayout({ children }: DashboardLayoutProps
     getTasksDueToday(),
   ]);
 
+  const cookieStore = await cookies();
+  const sidebarOpen = cookieStore.get('sidebar_state')?.value !== 'false';
+
   return (
     <LiveTaskProvider todayTasks={todayTasks}>
-      <div className="flex h-screen overflow-hidden bg-background">
-        <KeyboardShortcuts />
-        <div className="hidden md:flex">
+      <CommandPaletteProvider lists={lists}>
+        <SidebarProvider defaultOpen={sidebarOpen}>
+          <KeyboardShortcuts />
           <Sidebar lists={lists} />
-        </div>
-        <div className="flex min-w-0 flex-1 flex-col">
-          <Topbar
-            title="TaskFlow"
-            user={{
-              displayName: profile?.display_name ?? null,
-              email: user?.email ?? null,
-              avatarUrl: profile?.avatar_url ?? null,
-            }}
-            lists={lists}
-          />
-          <main className="flex-1 overflow-y-auto p-6">{children}</main>
-        </div>
-      </div>
+          <SidebarInset>
+            <Topbar
+              title="TaskFlow"
+              user={{
+                displayName: profile?.display_name ?? null,
+                email: user?.email ?? null,
+                avatarUrl: profile?.avatar_url ?? null,
+              }}
+            />
+            <main className="flex-1 overflow-y-auto p-6">{children}</main>
+          </SidebarInset>
+        </SidebarProvider>
+      </CommandPaletteProvider>
     </LiveTaskProvider>
   );
 }

@@ -2,129 +2,119 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { Settings, LogOut, ListTodo } from 'lucide-react';
 import {
-  LayoutDashboard,
-  ListTodo,
-  CalendarCheck,
-  CalendarDays,
-  Inbox,
-  Folders,
-  BarChart3,
-  Settings,
-  LogOut,
-} from 'lucide-react';
-import { cn } from '@/lib/utils';
+  Sidebar as SidebarPrimitive,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarRail,
+  SidebarSeparator,
+} from '@/components/ui/sidebar';
 import { signOut } from '@/lib/actions/auth';
+import { NAV_ITEMS, isPathActive } from '@/components/app-shell/nav-items';
 import type { ListRow } from '@/types/database';
 
 interface SidebarProps {
   lists: ListRow[];
 }
 
-const NAV_ITEMS = [
-  { href: '/', label: 'Overview', icon: LayoutDashboard },
-  { href: '/tasks', label: 'Tasks', icon: ListTodo },
-  { href: '/today', label: 'Today', icon: CalendarCheck },
-  { href: '/upcoming', label: 'Upcoming', icon: CalendarDays },
-  { href: '/inbox', label: 'Inbox', icon: Inbox },
-  { href: '/lists', label: 'Lists', icon: Folders },
-  { href: '/analytics', label: 'Analytics', icon: BarChart3 },
-];
-
-function isPathActive(pathname: string, href: string) {
-  if (href === '/') return pathname === '/';
-  return pathname === href || pathname.startsWith(`${href}/`);
-}
-
 export function Sidebar({ lists }: SidebarProps) {
   const pathname = usePathname();
 
   return (
-    <aside className="flex h-full w-60 shrink-0 flex-col border-r bg-card">
-      <div className="px-5 py-5">
-        <span className="text-lg font-semibold tracking-tight text-foreground">TaskFlow</span>
-      </div>
-
-      <nav className="flex flex-col gap-0.5 px-3">
-        {NAV_ITEMS.map((item) => {
-          const active = isPathActive(pathname, item.href);
-          const Icon = item.icon;
-
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                'flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
-                active
-                  ? 'bg-primary/10 text-primary'
-                  : 'text-muted-foreground hover:bg-muted hover:text-foreground',
-              )}
-            >
-              <Icon size={17} />
-              {item.label}
-            </Link>
-          );
-        })}
-      </nav>
-
-      <div className="mx-5 my-3 border-t" />
-
-      <div className="flex-1 overflow-y-auto px-3">
-        {lists.length > 0 && (
-          <div className="flex flex-col gap-0.5">
-            <span className="px-3 pb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-              Lists
-            </span>
-            {lists.map((list) => {
-              const href = `/lists/${list.id}`;
-              const active = pathname === href;
-
-              return (
-                <Link
-                  key={list.id}
-                  href={href}
-                  className={cn(
-                    'flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-colors',
-                    active
-                      ? 'bg-primary/10 text-primary'
-                      : 'text-muted-foreground hover:bg-muted hover:text-foreground',
-                  )}
-                >
-                  <span
-                    className="h-2 w-2 shrink-0 rounded-full"
-                    style={{ backgroundColor: list.color }}
-                  />
-                  <span className="truncate">{list.name}</span>
-                </Link>
-              );
-            })}
+    <SidebarPrimitive collapsible="icon">
+      <SidebarHeader className="px-2 py-3">
+        <div className="flex items-center gap-2 px-2">
+          <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+            <ListTodo size={16} />
           </div>
-        )}
-      </div>
+          <span className="truncate text-base font-semibold tracking-tight text-foreground group-data-[collapsible=icon]:hidden">
+            TaskFlow
+          </span>
+        </div>
+      </SidebarHeader>
 
-      <div className="flex flex-col gap-0.5 border-t px-3 py-3">
-        <Link
-          href="/settings"
-          className={cn(
-            'flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
-            isPathActive(pathname, '/settings')
-              ? 'bg-primary/10 text-primary'
-              : 'text-muted-foreground hover:bg-muted hover:text-foreground',
-          )}
-        >
-          <Settings size={17} />
-          Settings
-        </Link>
-        <button
-          type="button"
-          onClick={() => signOut()}
-          className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-        >
-          <LogOut size={17} />
-          Sign out
-        </button>
-      </div>
-    </aside>
+      <SidebarContent>
+        <SidebarGroup>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {NAV_ITEMS.map((item) => {
+                const active = isPathActive(pathname, item.href);
+                const Icon = item.icon;
+
+                return (
+                  <SidebarMenuItem key={item.href}>
+                    <SidebarMenuButton asChild isActive={active} tooltip={item.label}>
+                      <Link href={item.href}>
+                        <Icon />
+                        <span>{item.label}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        {lists.length > 0 ? (
+          <SidebarGroup>
+            <SidebarGroupLabel>Lists</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {lists.map((list) => {
+                  const href = `/lists/${list.id}`;
+                  const active = pathname === href;
+
+                  return (
+                    <SidebarMenuItem key={list.id}>
+                      <SidebarMenuButton asChild isActive={active} tooltip={list.name}>
+                        <Link href={href}>
+                          <span
+                            className="h-2 w-2 shrink-0 rounded-full"
+                            style={{ backgroundColor: list.color }}
+                          />
+                          <span className="truncate">{list.name}</span>
+                        </Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  );
+                })}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        ) : null}
+      </SidebarContent>
+
+      <SidebarSeparator />
+
+      <SidebarFooter>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton asChild isActive={isPathActive(pathname, '/settings')} tooltip="Settings">
+              <Link href="/settings">
+                <Settings />
+                <span>Settings</span>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <SidebarMenuButton tooltip="Sign out" onClick={() => signOut()}>
+              <LogOut />
+              <span>Sign out</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
+
+      <SidebarRail />
+    </SidebarPrimitive>
   );
 }
