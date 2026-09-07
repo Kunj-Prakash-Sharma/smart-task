@@ -10,7 +10,7 @@ export interface ErrorStateProps {
 
 export function ErrorState({ message, retry }: ErrorStateProps) {
   return (
-    <div className="flex flex-col items-center justify-center gap-1 px-6 py-16 text-center">
+    <div className="flex flex-col items-center justify-center gap-1 rounded-xl border border-dashed px-6 py-16 text-center">
       <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-destructive/10">
         <AlertTriangle size={20} className="text-destructive" />
       </div>
