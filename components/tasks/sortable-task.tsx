@@ -26,7 +26,7 @@ export function SortableTask({ id, children, disabled }: SortableTaskProps) {
     <div
       ref={setNodeRef}
       style={style}
-      className={cn(isDragging && 'opacity-50')}
+      className={cn(isDragging && 'z-10 opacity-90 shadow-lg [&>*]:rotate-1')}
       {...attributes}
       {...listeners}
     >

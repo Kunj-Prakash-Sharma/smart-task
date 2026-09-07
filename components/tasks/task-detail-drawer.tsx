@@ -10,13 +10,13 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { cn } from '@/lib/utils';
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+} from '@/components/ui/sheet';
 import { Input } from '@/components/ui/input';
 import {
   Select,
@@ -58,7 +58,7 @@ export function TaskDetailDrawer({ task, onOpenChange, onToggle }: TaskDetailDra
   }, [task?.id]);
 
   if (!task) {
-    return <Dialog open={false} onOpenChange={onOpenChange} />;
+    return <Sheet open={false} onOpenChange={onOpenChange} />;
   }
 
   const currentTask = task;
@@ -162,10 +162,14 @@ export function TaskDetailDrawer({ task, onOpenChange, onToggle }: TaskDetailDra
 
   return (
     <>
-      <Dialog open onOpenChange={onOpenChange}>
-        <DialogContent key={currentTask.id} className="max-w-md gap-4">
-          <DialogHeader>
-            <div className="flex items-start gap-2">
+      <Sheet open onOpenChange={onOpenChange}>
+        <SheetContent
+          key={currentTask.id}
+          side="right"
+          className="flex w-full flex-col gap-4 overflow-y-auto sm:max-w-md"
+        >
+          <SheetHeader>
+            <div className="flex items-start gap-2 pr-6">
               <Checkbox
                 className="mt-1"
                 checked={currentTask.status === 'completed'}
@@ -178,11 +182,11 @@ export function TaskDetailDrawer({ task, onOpenChange, onToggle }: TaskDetailDra
                 className="h-auto flex-1 border-none px-0 text-base font-semibold shadow-none focus-visible:ring-0"
               />
             </div>
-            <DialogTitle className="sr-only">Task details</DialogTitle>
-            <DialogDescription className="sr-only">
+            <SheetTitle className="sr-only">Task details</SheetTitle>
+            <SheetDescription className="sr-only">
               View and edit this task&apos;s details.
-            </DialogDescription>
-          </DialogHeader>
+            </SheetDescription>
+          </SheetHeader>
 
           <Textarea
             value={description}
@@ -260,7 +264,7 @@ export function TaskDetailDrawer({ task, onOpenChange, onToggle }: TaskDetailDra
             </div>
           ) : null}
 
-          <DialogFooter className="sm:justify-between">
+          <SheetFooter className="mt-auto border-t pt-4 sm:justify-between">
             {liveTask?.id === currentTask.id ? (
               <div className="flex items-center gap-2">
                 <span className="font-mono text-sm tabular-nums text-muted-foreground">
@@ -292,9 +296,9 @@ export function TaskDetailDrawer({ task, onOpenChange, onToggle }: TaskDetailDra
             <Button variant="destructive" onClick={() => setConfirmOpen(true)}>
               Delete task
             </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+          </SheetFooter>
+        </SheetContent>
+      </Sheet>
 
       <ConfirmDialog
         open={confirmOpen}
