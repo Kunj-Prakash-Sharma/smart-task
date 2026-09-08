@@ -454,10 +454,23 @@ function LiveTaskWidgetContent({
   onNext,
   onTaskCreated,
 }: LiveTaskWidgetContentProps) {
-  // Two trigger sizes for the same dialog: a small icon button that sits
-  // next to the timer controls while a task is active, and a full labeled
-  // button alongside "Close" once the queue is empty. Both are no-ops when
-  // there's no owned list to create into.
+  // The trigger is often clicked while the PiP window — not the main tab —
+  // has OS focus. TaskCreateDialog's Dialog portals into the main
+  // document (see the module comment on PIP_STYLES for why), so without
+  // this the dialog can pop up behind/unnoticed on an unfocused tab.
+  // Best-effort: browsers are free to ignore a script-initiated focus().
+  function focusOpenerWindow() {
+    try {
+      window.focus();
+    } catch {
+      // ignore
+    }
+  }
+
+  // Two trigger sizes for the same dialog: a compact "Add" button that sits
+  // next to the timer controls while a task is active, and a full-width
+  // "Add task" button alongside "Close" once the queue is empty. Both are
+  // no-ops when there's no owned list to create into.
   const addTaskIconTrigger =
     defaultListId !== null ? (
       <TaskCreateDialog
@@ -469,18 +482,22 @@ function LiveTaskWidgetContent({
               type="button"
               aria-label="Add task"
               title="Add task"
-              style={{ flex: '0 0 auto', width: 28, height: 24, padding: 0 }}
+              onClick={focusOpenerWindow}
+              style={{ flex: '0 0 auto', height: 24, padding: '0 8px', gap: 4 }}
             >
-              <Plus size={13} />
+              <Plus size={12} />
+              Add
             </button>
           ) : (
             <button
               type="button"
               aria-label="Add task"
               title="Add task"
-              className="text-muted-foreground hover:text-foreground"
+              onClick={focusOpenerWindow}
+              className="flex shrink-0 items-center gap-1 rounded-md border px-2 py-1 text-xs font-medium text-muted-foreground hover:bg-accent hover:text-foreground"
             >
-              <Plus size={15} />
+              <Plus size={13} />
+              Add
             </button>
           )
         }
@@ -494,13 +511,14 @@ function LiveTaskWidgetContent({
         onCreated={onTaskCreated}
         trigger={
           floating ? (
-            <button type="button" className="primary">
+            <button type="button" className="primary" onClick={focusOpenerWindow}>
               <Plus size={13} />
               Add task
             </button>
           ) : (
             <button
               type="button"
+              onClick={focusOpenerWindow}
               className="flex h-8 flex-1 items-center justify-center gap-1.5 rounded-md bg-primary text-xs font-semibold text-primary-foreground hover:bg-primary/90"
             >
               <Plus size={14} />
