@@ -2,6 +2,7 @@ import { Avatar } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { CommandPaletteTrigger } from '@/components/app-shell/command-palette';
+import { ThemeToggle } from '@/components/app-shell/theme-toggle';
 
 interface TopbarUser {
   displayName: string | null;
@@ -25,6 +26,7 @@ export function Topbar({ title, user }: TopbarProps) {
 
       <div className="flex items-center gap-3">
         <CommandPaletteTrigger />
+        <ThemeToggle />
         <Avatar name={user.displayName ?? user.email} src={user.avatarUrl} />
       </div>
     </header>

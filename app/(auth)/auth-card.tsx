@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { ListTodo } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { ThemeToggle } from '@/components/app-shell/theme-toggle';
 
 export interface AuthCardProps {
   title: string;
@@ -23,6 +24,10 @@ export function AuthCard({ title, description, children, footer }: AuthCardProps
         className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[420px] bg-gradient-to-b from-primary/10 via-transparent to-transparent"
         aria-hidden
       />
+
+      <div className="absolute right-4 top-4">
+        <ThemeToggle />
+      </div>
 
       <div className="w-full max-w-sm">
         <div className="mb-6 flex items-center justify-center gap-2">
