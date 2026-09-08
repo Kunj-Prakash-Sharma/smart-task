@@ -28,16 +28,17 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { createTask } from '@/lib/actions/tasks';
 import { PRIORITY_LABELS, TASK_PRIORITIES } from '@/lib/constants';
-import type { TaskPriority } from '@/types/database';
+import type { TaskPriority, TaskRow } from '@/types/database';
 
 export interface TaskCreateDialogProps {
   listId: string;
   trigger?: ReactNode;
+  onCreated?: (task: TaskRow) => void;
 }
 
 const DEFAULT_PRIORITY: TaskPriority = 'medium';
 
-export function TaskCreateDialog({ listId, trigger }: TaskCreateDialogProps) {
+export function TaskCreateDialog({ listId, trigger, onCreated }: TaskCreateDialogProps) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [isPending, setIsPending] = useState(false);
@@ -89,6 +90,7 @@ export function TaskCreateDialog({ listId, trigger }: TaskCreateDialogProps) {
     }
 
     toast.success('Task created');
+    onCreated?.(result.data);
     handleOpenChange(false);
     router.refresh();
   }

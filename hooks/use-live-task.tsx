@@ -12,10 +12,11 @@ import {
 } from 'react';
 import { createPortal } from 'react-dom';
 import { toast } from 'sonner';
-import { CheckCircle2 } from 'lucide-react';
+import { CheckCircle2, Plus } from 'lucide-react';
 import { toggleTask, updateTask } from '@/lib/actions/tasks';
 import { openExternalLinkIfCompleting } from '@/lib/utils/external-link';
-import type { TaskWithTags } from '@/types/database';
+import { TaskCreateDialog } from '@/components/tasks/task-create-dialog';
+import type { TaskRow, TaskWithTags } from '@/types/database';
 
 function byDueDateAscending(a: TaskWithTags, b: TaskWithTags): number {
   const aTime = a.due_date ? new Date(a.due_date).getTime() : Infinity;
@@ -95,9 +96,11 @@ export interface LiveTaskProviderProps {
   children: ReactNode;
   /** Today's due tasks, used as the queue the widget's "Next" button pulls from. */
   todayTasks: TaskWithTags[];
+  /** List the widget's own "+" quick-add creates into; null hides that trigger. */
+  defaultListId: string | null;
 }
 
-export function LiveTaskProvider({ children, todayTasks }: LiveTaskProviderProps) {
+export function LiveTaskProvider({ children, todayTasks, defaultListId }: LiveTaskProviderProps) {
   const [liveTask, setLiveTask] = useState<TaskWithTags | null>(null);
   const [isRunning, setIsRunning] = useState(false);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
@@ -246,6 +249,23 @@ export function LiveTaskProvider({ children, todayTasks }: LiveTaskProviderProps
     [clearTick, setTaskStatusRemote],
   );
 
+  // Fed to the widget's own "+" quick-add (TaskCreateDialog). A new task
+  // always joins the in-memory queue; if nothing is currently playing it
+  // becomes the live task right away via the same beginTask() path
+  // goToNext()/startFocus() already use, otherwise it just waits its turn.
+  const handleQuickTaskCreated = useCallback(
+    (task: TaskRow) => {
+      const withTags: TaskWithTags = { ...task, task_tags: [] };
+      queueRef.current = [...queueRef.current, withTags].sort(byDueDateAscending);
+
+      if (!liveTaskRef.current) {
+        setShowAllDone(false);
+        beginTask(withTags);
+      }
+    },
+    [beginTask],
+  );
+
   const stopFocus = useCallback(() => {
     clearTick();
     void flushElapsed({ revertToTodo: true });
@@ -388,6 +408,8 @@ export function LiveTaskProvider({ children, todayTasks }: LiveTaskProviderProps
       onStop={stopFocus}
       onNext={goToNext}
       floating={usingFloatingWindow}
+      defaultListId={defaultListId}
+      onTaskCreated={handleQuickTaskCreated}
     />
   ) : null;
 
@@ -410,11 +432,13 @@ interface LiveTaskWidgetContentProps {
   elapsedSeconds: number;
   isRunning: boolean;
   floating: boolean;
+  defaultListId: string | null;
   onPlay: () => void;
   onPause: () => void;
   onDone: () => void;
   onStop: () => void;
   onNext: () => void;
+  onTaskCreated: (task: TaskRow) => void;
 }
 
 function LiveTaskWidgetContent({
@@ -422,12 +446,71 @@ function LiveTaskWidgetContent({
   elapsedSeconds,
   isRunning,
   floating,
+  defaultListId,
   onPlay,
   onPause,
   onDone,
   onStop,
   onNext,
+  onTaskCreated,
 }: LiveTaskWidgetContentProps) {
+  // Two trigger sizes for the same dialog: a small icon button that sits
+  // next to the timer controls while a task is active, and a full labeled
+  // button alongside "Close" once the queue is empty. Both are no-ops when
+  // there's no owned list to create into.
+  const addTaskIconTrigger =
+    defaultListId !== null ? (
+      <TaskCreateDialog
+        listId={defaultListId}
+        onCreated={onTaskCreated}
+        trigger={
+          floating ? (
+            <button
+              type="button"
+              aria-label="Add task"
+              title="Add task"
+              style={{ flex: '0 0 auto', width: 28, height: 24, padding: 0 }}
+            >
+              <Plus size={13} />
+            </button>
+          ) : (
+            <button
+              type="button"
+              aria-label="Add task"
+              title="Add task"
+              className="text-muted-foreground hover:text-foreground"
+            >
+              <Plus size={15} />
+            </button>
+          )
+        }
+      />
+    ) : null;
+
+  const addTaskFullTrigger =
+    defaultListId !== null ? (
+      <TaskCreateDialog
+        listId={defaultListId}
+        onCreated={onTaskCreated}
+        trigger={
+          floating ? (
+            <button type="button" className="primary">
+              <Plus size={13} />
+              Add task
+            </button>
+          ) : (
+            <button
+              type="button"
+              className="flex h-8 flex-1 items-center justify-center gap-1.5 rounded-md bg-primary text-xs font-semibold text-primary-foreground hover:bg-primary/90"
+            >
+              <Plus size={14} />
+              Add task
+            </button>
+          )
+        }
+      />
+    ) : null;
+
   if (!task) {
     if (floating) {
       return (
@@ -440,6 +523,7 @@ function LiveTaskWidgetContent({
             <button type="button" onClick={onStop}>
               Close
             </button>
+            {addTaskFullTrigger}
           </div>
         </div>
       );
@@ -449,13 +533,16 @@ function LiveTaskWidgetContent({
       <div className="flex flex-col items-center gap-3 p-5 text-center">
         <CheckCircle2 size={28} className="text-success" />
         <p className="text-sm font-semibold">You&apos;re all good today!</p>
-        <button
-          type="button"
-          onClick={onStop}
-          className="h-8 w-full rounded-md border text-xs font-semibold hover:bg-accent"
-        >
-          Close
-        </button>
+        <div className="flex w-full gap-2">
+          <button
+            type="button"
+            onClick={onStop}
+            className="h-8 flex-1 rounded-md border text-xs font-semibold hover:bg-accent"
+          >
+            Close
+          </button>
+          {addTaskFullTrigger}
+        </div>
       </div>
     );
   }
@@ -463,7 +550,12 @@ function LiveTaskWidgetContent({
   if (floating) {
     return (
       <div className="wrap">
-        <div className="title">{task.title}</div>
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
+          <div className="title" style={{ flex: 1 }}>
+            {task.title}
+          </div>
+          {addTaskIconTrigger}
+        </div>
         <div className="timer">{formatElapsed(elapsedSeconds)}</div>
         <div className="row">
           {isRunning ? (
@@ -490,14 +582,17 @@ function LiveTaskWidgetContent({
     <div className="flex flex-col gap-2.5 p-3.5">
       <div className="flex items-start justify-between gap-2">
         <p className="line-clamp-2 flex-1 text-sm font-semibold">{task.title}</p>
-        <button
-          type="button"
-          onClick={onStop}
-          className="text-xs text-muted-foreground hover:text-foreground"
-          aria-label="Stop focus"
-        >
-          ✕
-        </button>
+        <div className="flex shrink-0 items-center gap-2">
+          {addTaskIconTrigger}
+          <button
+            type="button"
+            onClick={onStop}
+            className="text-xs text-muted-foreground hover:text-foreground"
+            aria-label="Stop focus"
+          >
+            ✕
+          </button>
+        </div>
       </div>
       <div className="font-mono text-2xl font-bold tabular-nums">{formatElapsed(elapsedSeconds)}</div>
       <div className="flex gap-2">

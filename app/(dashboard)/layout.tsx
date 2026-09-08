@@ -30,8 +30,10 @@ export default async function DashboardLayout({ children }: DashboardLayoutProps
   const cookieStore = await cookies();
   const sidebarOpen = cookieStore.get('sidebar_state')?.value !== 'false';
 
+  const defaultListId = lists.find((list) => list.owner_id === user?.id)?.id ?? null;
+
   return (
-    <LiveTaskProvider todayTasks={todayTasks}>
+    <LiveTaskProvider todayTasks={todayTasks} defaultListId={defaultListId}>
       <CommandPaletteProvider lists={lists}>
         <SidebarProvider defaultOpen={sidebarOpen}>
           <KeyboardShortcuts />
