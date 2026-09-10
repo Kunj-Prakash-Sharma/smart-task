@@ -6,7 +6,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { TaskPriorityBadge } from '@/components/tasks/task-priority-badge';
 import { TaskTags } from '@/components/tasks/task-tags';
 import { cn } from '@/lib/utils';
-import { formatDueDate, isOverdue } from '@/lib/utils/dates';
+import { describeRecurrence, formatDueDate, isOverdue } from '@/lib/utils/dates';
 import type { TaskWithTags } from '@/types/database';
 
 export interface TaskCardProps {
@@ -44,8 +44,8 @@ export function TaskCard({ task, onToggle, onClick }: TaskCardProps) {
       </div>
       <div className="mt-2.5 flex flex-wrap items-center gap-1.5 pl-6">
         <TaskPriorityBadge priority={task.priority} />
-        {task.is_recurring ? (
-          <span title="Repeats every working day" className="text-muted-foreground">
+        {task.recurrence_days.length > 0 ? (
+          <span title={describeRecurrence(task.recurrence_days)} className="text-muted-foreground">
             <Repeat size={13} />
           </span>
         ) : null}

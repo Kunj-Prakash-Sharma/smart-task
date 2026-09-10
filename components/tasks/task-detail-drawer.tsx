@@ -4,10 +4,12 @@ import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { ExternalLink, Pause, Play, Repeat, Timer } from 'lucide-react';
 import { ConfirmDialog } from '@/components/shared/confirm-dialog';
+import { RecurrenceDayPicker } from '@/components/tasks/recurrence-day-picker';
 import { TaskStatusSelector } from '@/components/tasks/task-status-selector';
 import { TaskTags } from '@/components/tasks/task-tags';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
 import {
   Sheet,
@@ -28,7 +30,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { deleteTask, updateTask } from '@/lib/actions/tasks';
 import { PRIORITY_LABELS, TASK_PRIORITIES } from '@/lib/constants';
-import { toDateInputValue } from '@/lib/utils/dates';
+import { describeRecurrence, toDateInputValue } from '@/lib/utils/dates';
 import { openExternalLinkIfCompleting } from '@/lib/utils/external-link';
 import { formatElapsed, useLiveTask } from '@/hooks/use-live-task';
 import type { TaskPriority, TaskStatus, TaskWithTags } from '@/types/database';
@@ -141,13 +143,13 @@ export function TaskDetailDrawer({ task, onOpenChange, onToggle }: TaskDetailDra
     toast.success('Task updated');
   }
 
-  async function handleRecurringToggle() {
-    const result = await updateTask({ taskId: currentTask.id, isRecurring: !currentTask.is_recurring });
+  async function handleRecurrenceChange(days: number[]) {
+    const result = await updateTask({ taskId: currentTask.id, recurrenceDays: days });
     if (!result.ok) {
       toast.error(result.error);
       return;
     }
-    toast.success(currentTask.is_recurring ? 'Repeat turned off' : 'Repeats every working day');
+    toast.success(describeRecurrence(days));
   }
 
   async function handleDelete() {
@@ -220,20 +222,31 @@ export function TaskDetailDrawer({ task, onOpenChange, onToggle }: TaskDetailDra
               onBlur={handleDueDateBlur}
               className="h-8 rounded-md border border-input bg-background px-2 text-xs shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
             />
-            <button
-              type="button"
-              onClick={handleRecurringToggle}
-              title="Repeat every working day"
-              className={cn(
-                'flex h-8 items-center gap-1.5 rounded-md border px-2 text-xs font-medium transition-colors',
-                currentTask.is_recurring
-                  ? 'border-primary bg-primary/10 text-primary'
-                  : 'border-input text-muted-foreground hover:bg-accent',
-              )}
-            >
-              <Repeat size={13} />
-              Repeat
-            </button>
+            <Popover>
+              <PopoverTrigger asChild>
+                <button
+                  type="button"
+                  title={describeRecurrence(currentTask.recurrence_days)}
+                  className={cn(
+                    'flex h-8 items-center gap-1.5 rounded-md border px-2 text-xs font-medium transition-colors',
+                    currentTask.recurrence_days.length > 0
+                      ? 'border-primary bg-primary/10 text-primary'
+                      : 'border-input text-muted-foreground hover:bg-accent',
+                  )}
+                >
+                  <Repeat size={13} />
+                  {currentTask.recurrence_days.length > 0
+                    ? describeRecurrence(currentTask.recurrence_days)
+                    : 'Repeat'}
+                </button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto" align="start">
+                <RecurrenceDayPicker
+                  value={currentTask.recurrence_days}
+                  onChange={handleRecurrenceChange}
+                />
+              </PopoverContent>
+            </Popover>
           </div>
 
           <div className="flex items-center gap-2">

@@ -5,7 +5,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { TaskPriorityBadge } from '@/components/tasks/task-priority-badge';
 import { TaskTags } from '@/components/tasks/task-tags';
 import { cn } from '@/lib/utils';
-import { formatDueDate, isOverdue } from '@/lib/utils/dates';
+import { describeRecurrence, formatDueDate, isOverdue } from '@/lib/utils/dates';
 import type { TaskWithTags } from '@/types/database';
 
 export interface TaskRowProps {
@@ -40,8 +40,8 @@ export function TaskRow({ task, onToggle, onClick }: TaskRowProps) {
         {task.title}
       </p>
       <TaskPriorityBadge priority={task.priority} />
-      {task.is_recurring ? (
-        <span title="Repeats every working day" className="shrink-0 text-muted-foreground">
+      {task.recurrence_days.length > 0 ? (
+        <span title={describeRecurrence(task.recurrence_days)} className="shrink-0 text-muted-foreground">
           <Repeat size={13} />
         </span>
       ) : null}

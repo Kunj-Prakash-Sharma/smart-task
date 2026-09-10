@@ -42,7 +42,7 @@ export type TaskRow = {
   created_by: string;
   assigned_to: string | null;
   completed_at: string | null;
-  is_recurring: boolean;
+  recurrence_days: number[];
   external_url: string | null;
   created_at: string;
   updated_at: string;

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Plus } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
+import { RecurrenceDayPicker } from '@/components/tasks/recurrence-day-picker';
 import {
   Dialog,
   DialogClose,
@@ -46,7 +46,7 @@ export function TaskCreateDialog({ listId, trigger, onCreated }: TaskCreateDialo
   const [description, setDescription] = useState('');
   const [priority, setPriority] = useState<TaskPriority>(DEFAULT_PRIORITY);
   const [dueDate, setDueDate] = useState('');
-  const [isRecurring, setIsRecurring] = useState(false);
+  const [recurrenceDays, setRecurrenceDays] = useState<number[]>([]);
   const [externalUrl, setExternalUrl] = useState('');
 
   function resetForm() {
@@ -54,7 +54,7 @@ export function TaskCreateDialog({ listId, trigger, onCreated }: TaskCreateDialo
     setDescription('');
     setPriority(DEFAULT_PRIORITY);
     setDueDate('');
-    setIsRecurring(false);
+    setRecurrenceDays([]);
     setExternalUrl('');
   }
 
@@ -79,7 +79,7 @@ export function TaskCreateDialog({ listId, trigger, onCreated }: TaskCreateDialo
       description: description.trim() || undefined,
       priority,
       dueDate: dueDate ? new Date(dueDate).toISOString() : undefined,
-      isRecurring,
+      recurrenceDays,
       externalUrl: externalUrl.trim() || undefined,
     });
     setIsPending(false);
@@ -182,15 +182,9 @@ export function TaskCreateDialog({ listId, trigger, onCreated }: TaskCreateDialo
             />
           </div>
 
-          <div className="flex items-center gap-2">
-            <Checkbox
-              id="task-repeat"
-              checked={isRecurring}
-              onCheckedChange={(checked) => setIsRecurring(checked === true)}
-            />
-            <Label htmlFor="task-repeat" className="cursor-pointer text-sm font-normal">
-              Repeat every working day
-            </Label>
+          <div className="flex flex-col gap-1.5">
+            <Label>Repeat</Label>
+            <RecurrenceDayPicker value={recurrenceDays} onChange={setRecurrenceDays} />
           </div>
 
           <DialogFooter>

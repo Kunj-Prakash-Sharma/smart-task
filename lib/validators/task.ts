@@ -27,7 +27,7 @@ export const createTaskSchema = z.object({
   aiEnergyScore: z.number().min(0).max(100).optional().nullable(),
   assignedTo: z.string().uuid().optional().nullable(),
   tagIds: z.array(z.string().uuid()).max(50).optional(),
-  isRecurring: z.boolean().optional(),
+  recurrenceDays: z.array(z.number().int().min(0).max(6)).max(7).optional(),
   externalUrl: externalUrlSchema.optional().nullable(),
 });
 
@@ -43,7 +43,7 @@ export const updateTaskSchema = z.object({
   aiEnergyScore: z.number().min(0).max(100).optional().nullable(),
   assignedTo: z.string().uuid().optional().nullable(),
   listId: z.string().uuid().optional(),
-  isRecurring: z.boolean().optional(),
+  recurrenceDays: z.array(z.number().int().min(0).max(6)).max(7).optional(),
   externalUrl: externalUrlSchema.optional().nullable(),
 });
 

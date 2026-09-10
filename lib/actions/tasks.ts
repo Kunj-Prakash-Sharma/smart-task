@@ -5,7 +5,7 @@ import { createClient } from '@/lib/supabase/server';
 import { ORDER_INDEX_GAP } from '@/lib/constants';
 import { actionError, actionOk, mapSupabaseError, type ActionResult } from '@/lib/utils/errors';
 import { mutable } from '@/lib/supabase/mutable';
-import { nextWorkingDay } from '@/lib/utils/dates';
+import { nextRecurrenceDate } from '@/lib/utils/dates';
 import {
   createTaskSchema,
   deleteTaskSchema,
@@ -31,13 +31,16 @@ async function requireUser() {
 }
 
 /**
- * When a task marked "repeat every working day" is completed, create the
- * next instance due on the next working day. Best-effort: failures here are
- * logged but don't fail the completion itself, since the user's completion
- * action already succeeded by the time this runs.
+ * When a recurring task (recurrence_days non-empty) is completed, create
+ * the next instance due on the next matching day. Best-effort: failures
+ * here are logged but don't fail the completion itself, since the user's
+ * completion action already succeeded by the time this runs.
  */
 async function scheduleNextRecurrence(supabase: unknown, completed: TaskRow): Promise<void> {
-  if (!completed.is_recurring) return;
+  if (completed.recurrence_days.length === 0) return;
+
+  const nextDate = nextRecurrenceDate(completed.due_date, completed.recurrence_days);
+  if (!nextDate) return;
 
   const { data: lastTask } = await mutable(supabase)
     .from('tasks')
@@ -56,11 +59,11 @@ async function scheduleNextRecurrence(supabase: unknown, completed: TaskRow): Pr
     description: completed.description,
     priority: completed.priority,
     status: 'todo',
-    due_date: nextWorkingDay(completed.due_date).toISOString(),
+    due_date: nextDate.toISOString(),
     estimated_minutes: completed.estimated_minutes,
     assigned_to: completed.assigned_to,
     created_by: completed.created_by,
-    is_recurring: true,
+    recurrence_days: completed.recurrence_days,
     external_url: completed.external_url,
     dynamic_order_index: lastOrder + ORDER_INDEX_GAP,
   });
@@ -115,7 +118,7 @@ export async function createTask(input: unknown): Promise<ActionResult<TaskRow>>
         assigned_to: parsed.data.assignedTo ?? null,
         created_by: user.id,
         dynamic_order_index: nextOrder,
-        is_recurring: parsed.data.isRecurring ?? false,
+        recurrence_days: parsed.data.recurrenceDays ?? [],
         external_url: parsed.data.externalUrl ?? null,
       });
 
@@ -172,7 +175,7 @@ export async function updateTask(input: unknown): Promise<ActionResult<TaskRow>>
     if (rest.aiEnergyScore !== undefined) patch.ai_energy_score = rest.aiEnergyScore;
     if (rest.assignedTo !== undefined) patch.assigned_to = rest.assignedTo;
     if (rest.listId !== undefined) patch.list_id = rest.listId;
-    if (rest.isRecurring !== undefined) patch.is_recurring = rest.isRecurring;
+    if (rest.recurrenceDays !== undefined) patch.recurrence_days = rest.recurrenceDays;
     if (rest.externalUrl !== undefined) patch.external_url = rest.externalUrl;
 
     const { error: updateError } = await mutable(supabase).from('tasks').update(patch).eq('id', taskId);
