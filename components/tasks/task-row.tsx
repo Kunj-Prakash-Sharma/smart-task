@@ -40,7 +40,7 @@ export function TaskRow({ task, onToggle, onClick }: TaskRowProps) {
         {task.title}
       </p>
       <TaskPriorityBadge priority={task.priority} />
-      {task.recurrence_days.length > 0 ? (
+      {task.recurrence_days?.length > 0 ? (
         <span title={describeRecurrence(task.recurrence_days)} className="shrink-0 text-muted-foreground">
           <Repeat size={13} />
         </span>

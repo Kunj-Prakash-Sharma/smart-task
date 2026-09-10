@@ -73,8 +73,8 @@ export function nextRecurrenceDate(fromIso: string | null, days: number[]): Date
 }
 
 /** Human-readable summary of a recurrence day set, recognizing common presets. */
-export function describeRecurrence(days: number[]): string {
-  if (days.length === 0) return 'Does not repeat';
+export function describeRecurrence(days: number[] | null | undefined): string {
+  if (!days || days.length === 0) return 'Does not repeat';
 
   const sorted = [...days].sort((a, b) => a - b);
 

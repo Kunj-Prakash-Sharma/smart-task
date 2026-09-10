@@ -44,7 +44,7 @@ export function TaskCard({ task, onToggle, onClick }: TaskCardProps) {
       </div>
       <div className="mt-2.5 flex flex-wrap items-center gap-1.5 pl-6">
         <TaskPriorityBadge priority={task.priority} />
-        {task.recurrence_days.length > 0 ? (
+        {task.recurrence_days?.length > 0 ? (
           <span title={describeRecurrence(task.recurrence_days)} className="text-muted-foreground">
             <Repeat size={13} />
           </span>

@@ -229,20 +229,20 @@ export function TaskDetailDrawer({ task, onOpenChange, onToggle }: TaskDetailDra
                   title={describeRecurrence(currentTask.recurrence_days)}
                   className={cn(
                     'flex h-8 items-center gap-1.5 rounded-md border px-2 text-xs font-medium transition-colors',
-                    currentTask.recurrence_days.length > 0
+                    currentTask.recurrence_days?.length > 0
                       ? 'border-primary bg-primary/10 text-primary'
                       : 'border-input text-muted-foreground hover:bg-accent',
                   )}
                 >
                   <Repeat size={13} />
-                  {currentTask.recurrence_days.length > 0
+                  {currentTask.recurrence_days?.length > 0
                     ? describeRecurrence(currentTask.recurrence_days)
                     : 'Repeat'}
                 </button>
               </PopoverTrigger>
               <PopoverContent className="w-auto" align="start">
                 <RecurrenceDayPicker
-                  value={currentTask.recurrence_days}
+                  value={currentTask.recurrence_days ?? []}
                   onChange={handleRecurrenceChange}
                 />
               </PopoverContent>

@@ -37,7 +37,7 @@ async function requireUser() {
  * completion action already succeeded by the time this runs.
  */
 async function scheduleNextRecurrence(supabase: unknown, completed: TaskRow): Promise<void> {
-  if (completed.recurrence_days.length === 0) return;
+  if (!completed.recurrence_days?.length) return;
 
   const nextDate = nextRecurrenceDate(completed.due_date, completed.recurrence_days);
   if (!nextDate) return;
