@@ -418,7 +418,7 @@ export function LiveTaskProvider({ children, todayTasks, defaultListId }: LiveTa
       {children}
       {showWidget && usingFloatingWindow && portalContainer ? createPortal(widget, portalContainer) : null}
       {showWidget && !usingFloatingWindow ? (
-        <div className="fixed bottom-4 right-4 z-50 w-72 overflow-hidden rounded-xl border bg-card shadow-lg">
+        <div className="fixed bottom-[max(1rem,env(safe-area-inset-bottom))] right-[max(1rem,env(safe-area-inset-right))] z-50 w-72 overflow-hidden rounded-xl border bg-card shadow-lg">
           {widget}
         </div>
       ) : null}
